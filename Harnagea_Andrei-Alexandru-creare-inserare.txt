@@ -1,0 +1,192 @@
+EXERCITIUL 10
+
+/*CREAREA TABELELOR*/
+
+CREATE TABLE AUTOR (
+    id int NOT NULL,
+    nume_autor varchar(255) NOT NULL
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE COORDONATOR (
+	id int NOT NULL,
+	nume_coordonator varchar(255) NOT NULL, 
+	numar_telefon varchar(255)
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE SPONSOR (
+	id int NOT NULL,
+	nume_sponsor varchar(255) NOT NULL, 
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE EXPONAT (
+	id int NOT NULL,
+	nume_exponat varchar(255) NOT NULL, 
+	data_publicare date,
+	descriere text
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE EXPONAT_AUTOR_MAPPING (
+	id int NOT NULL,
+	id_autor int FOREIGN KEY REFERENCES AUTOR(id),
+	id_exponat int FOREIGN KEY REFERENCES EXPONAT(id),
+	PRIMARY KEY(id)
+);
+
+
+CREATE TABLE ORAS (
+	id int NOT NULL,
+	nume_oras varchar(255) NOT NULL, 
+	capitala binary NOT NULL
+	PRIMARY KEY(id)
+);
+
+
+CREATE TABLE STAFF (
+	id int NOT NULL,
+	nume_echipa varchar(255) NOT NULL, 
+	rol_staff varchar(255) NOT NULL,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE ANGAJAT (
+
+	id int NOT NULL,
+	nume_prenume varchar(255) NOT NULL, 
+	data_nasterii date NOT NULL, 
+	salariu float NOT NULL,
+	id_staff int FOREIGN KEY REFERENCES STAFF(id),
+	PRIMARY KEY(id)
+
+);
+
+CREATE TABLE GALERIE(
+
+	id int NOT NULL,
+	nume_galerie varchar(255) NOT NULL, 
+	id_oras int FOREIGN KEY REFERENCES ORAS(id),
+	id_coord int FOREIGN KEY REFERENCES COORDONATOR(id),
+	PRIMARY KEY(id)
+);
+
+ALTER TABLE EVENIMENT
+ADD idGalerie int NOT NULL FOREIGN KEY REFERENCES GALERIE(id);
+
+ALTER TABLE EVENIMENT
+ADD PRIMARY KEY(id);
+
+CREATE TABLE LOCATIE (
+	id int NOT NULL,
+	nume_loc varchar(255) NOT NULL, 
+	ora_inceput int NOT NULL,
+	ora_final int NOT NULL,
+	idEveniment int NOT NULL FOREIGN KEY REFERENCES EVENIMENT(id),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE EXPONAT_LOCATIE_MAPPING (
+	id int NOT NULL,
+	id_exponat int FOREIGN KEY REFERENCES EXPONAT(id),
+	id_locatie int FOREIGN KEY REFERENCES LOCATIE(id),
+	);
+
+	ALTER TABLE EXPONAT_LOCATIE_MAPPING
+	ADD PRIMARY KEY(id);
+
+CREATE TABLE GALERIE_SPONSOR_MAPPING (
+	id int NOT NULL,
+	id_galerie int FOREIGN KEY REFERENCES GALERIE(id),
+	id_sponsor int FOREIGN KEY REFERENCES SPONSOR(id),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE EVENIMENT_STAFF_MAPPING(
+	id int NOT NULL,
+	id_eveniment int FOREIGN KEY REFERENCES EVENIMENT(id),
+	id_staff int FOREIGN KEY REFERENCES STAFF(id),
+	PRIMARY KEY(id)
+);
+
+ALTER TABLE GALERIE_SPONSOR_MAPPING
+ADD donatie int NOT NULL;
+
+
+/*POPULAREA TABELELOR*/
+
+INSERT INTO AUTOR(id, nume_autor)
+VALUES (2,’PICASSO’),(3,’BRANCUSI’),(4,’Goya’);
+
+INSERT INTO EXPONAT(id,nume_exponat,data_publicare,descriere)
+VALUES (1,’Noapte Instelata’,’2004-01-22’,’este extrem de frumoasa’ );
+
+INSERT INTO EXPONAT(id,nume_exponat,data_publicare,descriere)
+VALUES (2,’Irisi’,’1960-04-02’,’’),(3,’Dormitor’,’’,’O opera controversata’),(4,’Cumintenia pamantului’,’’,’O sculptura renumita’),(5,’Coloana infinitului’,’1899-12-12’,’Cea mai renumita opera de arta romaneasca’),(6,’Guernica’,’’,’’),(7,’Autoportreet’,’1978-4-16’,’Portretul autorului’),(8,’Gigantul’,’1879-4-23’,’Opera horror’),(9,’Francisco’,’’,’Cutremurator’),(10,’Maja’,’1888-8-23’,’’);
+
+
+
+INSERT INTO EXPONAT_AUTOR_MAPPING(id_autor,id_exponat,id)
+VALUES (1,1,1);
+
+INSERT INTO EXPONAT_AUTOR_MAPPING(id_autor,id_exponat,id)
+VALUES (1,2,2),(1,3,3),(3,4,4),(3,5,5),(2,6,6),(2,7,7),(4,8,8),(4,9,9),(4,10,10);
+
+
+
+INSERT INTO LOCATIE(id,nume_loc,ora_inceput,ora_final,idEveniment)
+VALUES (1,’MUZEU’,10,20,1),(2,’HALL’,12,23,2),(3,’PRIMARIE’,8,16,3),(4,’MUZEU’,10,20,4),(5,’MUZEU’,10,20,5),(6,’HALL’,10,20,6),(7,’PRIMARIE’,10,20,7),(8,’MUZEU’,10,20,8);
+
+SELECT * FROM LOCATIE
+
+INSERT INTO EXPONAT_LOCATIE_MAPPING(id,id_exponat,id_locatie)
+VALUES (1,1,1),(2,2,1),(3,1,2),(4,3,4),(5,10,1),(6,7,8),(7,4,5),(8,9,5),(9,8,6),(10,5,4)
+
+
+
+SELECT * FROM EXPONAT
+
+INSERT INTO EVENIMENT(id,idGalerie,data_final,data_inceput,nume_eveniment)
+VALUES (1,1,’2012-12-14’,’2022-12-12’,’Partea 1’),(2,1,’2022-12-20’,’2022-12-25’,’Partea 2’),(3,2,’2002-3-12’,’2002-3-1’,’Can you believe?’),(4,3,’2012-6-14’,’2012-6-12’,’Wait’),(5,3,’2012-12-19’,’2012-12-15’,’Hold on’),(6,3,’2013-1-3’,’2013-12-6’,’You may go’),(7,4,’2020-4-7’,’6-4-2020’,’Flowers’),(8,4,’2022-5-7’,’2022-5-6’,’Trees’)
+
+
+INSERT INTO ORAS(id,nume_oras,capitala)
+VALUES (1,’Bucuresti’,1),(2,’Iasi’,0),(3,’Paris’,1)
+
+INSERT INTO ORAS(id,nume_oras,capitala)
+VALUES(4,’Vaslui’,0)
+
+INSERT INTO COORDONATOR(id,nume_coordonator,numar_telefon)
+VALUES (1,’Ionesco’,’0788888888’),(2,’Popesco’,’’),(3,’Boiesco’,’23984797132’)
+
+INSERT INTO COORDONATOR(id,nume_coordonator,numar_telefon)
+VALUES (4,’Crico’,’’)
+
+INSERT INTO GALERIE(id,nume_galerie,id_coord,id_oras)
+VALUES (1,’O  ventura in Bucuresti’,1,1),(2,’Cele mai frumoase arte’,2,2),(3,’De ce nu?’,3,3),(4,’Bonjour!’,3,4)
+
+UPDATE GALERIE
+SET id_oras=3
+WHERE id=4;
+
+INSERT INTO STAFF (id,nume_echipa,rol_staff)
+VALUES (1,’Cleansteam’,’curatare’),(2,’Ghidusii’,’guide’),(3,’Thunder’,’luminile’),(4,’Boddiies’,’securitate’)
+
+Insert into ANGAJAT (id, nume_prenume,salariu,data_nasterii,id_staff)
+VALUES (1,’Ion Popa’,1000,’2000-2-23’,1),(2,’Vasile’,1340,’1999-4-2’,1),(3,’Cristi’,2300,’1990-10-25’,1),(4,’Ana’,3000,’2001-12-23’,2),(5,’Ionel’,1500,’1964-2-13’,2),(6,’Dolores’,2000,’2000-2-2’,3),(7,’Mitica’,1400,’1970-9-8’,4),(8,’Flaco’,2000,’2002-8-7’,4)
+
+SELECT * FROM SPONSOR;
+
+INSERT INTO EVENIMENT_STAFF_MAPPING(id, id_eveniment,id_staff)
+VALUES (1,1,4),(2,2,3),(3,3,3),(4,1,3),(5,3,1),(6,5,2),(7,4,3),(8,8,3),(9,4,2),(10,7,3)
+
+INSERT INTO SPONSOR(id, nume_sponsor)
+VALUES (1,’Luca’),(2,’Microsoft’),(3,’Brita’)
+
+INSERT INTO GALERIE_SPONSOR_MAPPING(id, id_galerie,id_sponsor,donatie)
+VALUES (1,1,1,100),(2,1,2,322),(3,2,3,900),(4,2,1,89),(5,3,2,34),(6,3,1,200),(7,4,1,98),(8,1,3,324),(9,4,2,432),(10,4,3,234)
+
+
+
+

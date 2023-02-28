@@ -1,0 +1,164 @@
+
+/*EXERCITIUL 11*/
+
+
+SELECT nume_exponat,descriere,nume_autor,nume_loc,ora_inceput,ora_final FROM EXPONAT_AUTOR_MAPPING
+INNER JOIN EXPONAT ON EXPONAT_AUTOR_MAPPING.id_exponat = EXPONAT.id
+INNER JOIN AUTOR ON EXPONAT_AUTOR_MAPPING.id_AUTOR = AUTOR.id
+INNER JOIN EXPONAT_LOCATIE_MAPPING ON EXPONAT_AUTOR_MAPPING.id_exponat = EXPONAT_LOCATIE_MAPPING.id
+INNER JOIN LOCATIE ON EXPONAT_LOCATIE_MAPPING.id_locatie= LOCATIE.ID
+WHERE LOCATIE.ora_final = (SELECT MAX(ora_final) FROM LOCATIE)
+
+ 
+/*Query-ul afiseaza exponatele care sunt afisate pentru cea mai lunga perioada de timp*/
+
+
+SELECT COUNT(AUTOR.nume_autor), nume_autor
+FROM EXPONAT_AUTOR_MAPPING
+INNER JOIN AUTOR ON EXPONAT_AUTOR_MAPPING.id_AUTOR = AUTOR.id
+GROUP BY nume_autor
+ORDER BY COUNT(AUTOR.nume_autor) DESC;
+
+ 
+
+/*Query-ul afiseaza numarul cate exponate are fiecare autor*/
+
+
+SELECT nume_prenume,salariu FROM ANGAJAT WHERE (YEAR(GETDATE())-YEAR(data_nasterii) >30)
+
+
+/*Query-ul afiseaza persoanele care au varsta mai mica de 30 de ani.*/
+
+
+SELECT donatie, 
+CASE
+    WHEN donatie > 150 THEN 'donatie mica'
+    ELSE 'donatie mare'
+END as TXT
+from GALERIE_SPONSOR_MAPPING
+
+WITH aux(salmed) as
+    (SELECT avg(salariu) from ANGAJAT)
+        SELECT id,nume_prenume, salariu 
+        FROM ANGAJAT, aux 
+        WHERE ANGAJAT.salariu > aux.salmed;
+
+
+WITH aux(salmed) as
+    (SELECT avg(salariu) from ANGAJAT)
+        SELECT TRIM( '!,.-' FROM nume_prenume), id, salariu AS Result
+        FROM ANGAJAT, aux 
+        WHERE ANGAJAT.salariu < aux.salmed;
+
+ 
+
+/*Query-ul afiseaza angajatii care au salariul mai mic decat media celorlalti angajati*/
+
+
+SELECT COUNT(AUTOR.nume_autor), LEFT(nume_autor,1)
+FROM EXPONAT_AUTOR_MAPPING
+INNER JOIN AUTOR ON EXPONAT_AUTOR_MAPPING.id_AUTOR = AUTOR.id
+GROUP BY nume_autor
+ORDER BY COUNT(AUTOR.nume_autor) DESC;
+
+/*Query-ul afiseaza numarul de expoante a fiecarui autor si initiala acestora*/
+
+
+SELECT nume_coordonator FROM COORDONATOR WHERE numar_telefon IS NOT NULL;
+
+
+/*Query-ul afiseaza coordonatorii care au numar de telefon inregistrat.*/
+
+/*Query-ul efectueaza mai multe joinuri.*/
+
+SELECT nume_galerie, nume_sponsor,nume_oras,nume_coordonator,capitala from GALERIE_SPONSOR_MAPPING
+INNER JOIN GALERIE ON GALERIE_SPONSOR_MAPPING.id_galerie = GALERIE.id
+INNER JOIN SPONSOR ON GALERIE_SPONSOR_MAPPING.id_sponsor = SPONSOR.id
+INNER JOIN ORAS ON GALERIE.id_oras=ORAS.id
+INNER JOIN COORDONATOR ON GALERIE.id_coord=COORDONATOR.id
+WHERE capitala = 1
+
+ 
+
+
+/*Query-ul afiseaza angajatii care lucreaza la un eveniment la care se prezinta o opera care apartine lui Van-Gogh si se afla intr-o capitala*/
+
+SELECT nume_prenume FROM EVENIMENT_STAFF_MAPPING 
+INNER JOIN STAFF on EVENIMENT_STAFF_MAPPING.id_staff= STAFF.id
+INNER JOIN ANGAJAT ON STAFF.id=ANGAJAT.id_staff
+INNER JOIN EVENIMENT on EVENIMENT_STAFF_MAPPING.id_eveniment = EVENIMENT.id
+INNER JOIN LOCATIE ON LOCATIE.idEveniment=EVENIMENT.id
+INNER JOIN EXPONAT_LOCATIE_MAPPING ON LOCATIE.id=EXPONAT_LOCATIE_MAPPING.id_locatie
+INNER JOIN EXPONAT ON EXPONAT.id=EXPONAT_LOCATIE_MAPPING.id_exponat
+INNER JOIN EXPONAT_AUTOR_MAPPING ON EXPONAT.id=EXPONAT_AUTOR_MAPPING.id_exponat
+INNER JOIN AUTOR ON EXPONAT_AUTOR_MAPPING.id_autor=AUTOR.id
+INNER JOIN GALERIE ON GALERIE.id=EVENIMENT.idGalerie
+INNER JOIN ORAS ON GALERIE.id_oras=ORAS.id
+INNER JOIN COORDONATOR ON GALERIE.id_coord=COORDONATOR.id
+WHERE [ORAS].capitala = 1 AND [nume_autor]='Van-Gogh'
+ORDER BY [EVENIMENT].id
+
+ 
+
+
+/*Query-ul inlocuieste numarul de telefon cu o adresa de email in caz ca numarul de telefon nu este disponibil.*/
+
+
+UPDATE COORDONATOR
+SET numar_telefon=CONCAT(LOWER(nume_coordonator),'@gmail.com')
+WHERE numar_telefon IS NULL
+SELECT * FROM COORDONATOR
+
+/*EXERCITIUL 12*/
+
+/*Query-ul adauga cu 50% la salariul angajatilor care au maim ult de 50 de ani*/
+
+UPDATE ANGAJAT
+SET salariu=salariu+salariu*0.5
+WHERE (YEAR(GETDATE())-YEAR(data_nasterii)>50)
+
+   
+
+/*Query-ul concediaza angajatii care nu au implinit inca 18 ani.*/
+
+Insert into ANGAJAT (id, nume_prenume,salariu,data_nasterii,id_staff)
+VALUES (11,’Ionutz’,1223,’2010-2-5’,2)
+
+SELECT * FROM ANGAJAT
+
+DELETE FROM ANGAJAT WHERE  (YEAR(GETDATE())-YEAR(data_nasterii) <18);
+SELECT * FROM ANGAJAT
+
+/*EXERCITIUL 13*/
+
+/*Query-ul face un sequence pentru a facilita introducerea de angajati.*/
+
+CREATE SEQUENCE contor
+start with 9
+increment by 1
+minvalue 0
+maxvalue 1000
+cycle;
+
+INSERT into ANGAJAT VALUES(NEXT VALUE FOR contor,'Ioana','1987-8-2',2333,2);
+INSERT into ANGAJAT VALUES(NEXT VALUE FOR contor,'Gabi','1987-8-2',2332,2);
+SELECT * FROM ANGAJAT
+
+/*EXERCITIUL 14*/
+CREATE VIEW AUTORIxEXPONAT as
+SELECT nume_exponat,descriere,nume_autor,nume_loc,ora_inceput,ora_final FROM EXPONAT_AUTOR_MAPPING
+INNER JOIN EXPONAT ON EXPONAT_AUTOR_MAPPING.id_exponat = EXPONAT.id
+INNER JOIN AUTOR ON EXPONAT_AUTOR_MAPPING.id_AUTOR = AUTOR.id
+INNER JOIN EXPONAT_LOCATIE_MAPPING ON EXPONAT_AUTOR_MAPPING.id_exponat = EXPONAT_LOCATIE_MAPPING.id
+INNER JOIN LOCATIE ON EXPONAT_LOCATIE_MAPPING.id_locatie= LOCATIE.ID
+SELECT nume_exponat FROM AUTORIxEXPONAT where nume_autor='Van-Gogh'
+
+/*EXERCITIUL 16*/
+
+SELECT * FROM EXPONAT_AUTOR_MAPPING
+FULL OUTER JOIN  EXPONAT ON EXPONAT_AUTOR_MAPPING.id = EXPONAT.id
+FULL OUTER JOIN AUTOR ON EXPONAT_AUTOR_MAPPING.id_autor=AUTOR.id
+FULL OUTER JOIN EXPONAT_LOCATIE_MAPPING ON EXPONAT_AUTOR_MAPPING.id_exponat=EXPONAT_LOCATIE_MAPPING.id_exponat
+FULL OUTER JOIN LOCATIE ON LOCATIE.id=EXPONAT_LOCATIE_MAPPING.id
+FULL OUTER JOIN GALERIE ON LOCATIE.id=GALERIE.id
+
